@@ -6,7 +6,7 @@
   Author: Johan Eenfeldt
   Author URI: http://devel.kostdoktorn.se
   Text Domain: limit-login-attempts
-  Version: 1.7.1
+  Version: 1.8.0-dev
 
   Copyright 2008 - 2012 Johan Eenfeldt
 
@@ -94,8 +94,7 @@ add_action('plugins_loaded', 'limit_login_setup', 99999);
 
 /* Get options and setup filters & actions */
 function limit_login_setup() {
-	load_plugin_textdomain('limit-login-attempts', false
-			       , dirname(plugin_basename(__FILE__)));
+	load_plugin_textdomain( 'limit-login-attempts', false, plugin_basename( dirname( __FILE__ ) ) . '/languages' );
 
 	limit_login_setup_options();
 
@@ -170,7 +169,7 @@ function limit_login_get_address($type_name = '') {
 
 		return $_SERVER[LIMIT_LOGIN_DIRECT_ADDR];
 	}
-	
+
 	return '';
 }
 
@@ -392,7 +391,7 @@ function limit_login_failed($username) {
 
 	/* lockout? */
 	if($retries[$ip] % limit_login_option('allowed_retries') != 0) {
-		/* 
+		/*
 		 * Not lockout (yet!)
 		 * Do housecleaning (which also saves retry/valid values).
 		 */
@@ -407,7 +406,7 @@ function limit_login_failed($username) {
 	$retries_long = limit_login_option('allowed_retries')
 		* limit_login_option('allowed_lockouts');
 
-	/* 
+	/*
 	 * Note that retries and statistics are still counted and notifications
 	 * done as usual for whitelisted ips , but no lockout is done.
 	 */
@@ -528,7 +527,7 @@ function limit_login_notify_email($user) {
 		$when = sprintf(_n('%d minute', '%d minutes', $time, 'limit-login-attempts'), $time);
 	}
 
-	$blogname = is_limit_login_multisite() ? get_site_option('site_name') : get_option('blogname');	
+	$blogname = is_limit_login_multisite() ? get_site_option('site_name') : get_option('blogname');
 
 	if ($whitelisted) {
 		$subject = sprintf(__("[%s] Failed login attempts from whitelisted IP"
@@ -569,7 +568,7 @@ function limit_login_notify_log($user) {
 
 	/* can be written much simpler, if you do not mind php warnings */
 	if (isset($log[$ip])) {
-		if (isset($log[$ip][$user])) {	
+		if (isset($log[$ip][$user])) {
 			$log[$ip][$user]++;
 		} else {
 			$log[$ip][$user] = 1;
@@ -911,7 +910,7 @@ function limit_login_show_log($log) {
 }
 
 /* Actual admin page */
-function limit_login_option_page()	{	
+function limit_login_option_page()	{
 	limit_login_cleanup();
 
 	if (!current_user_can('manage_options')) {
@@ -922,7 +921,7 @@ function limit_login_option_page()	{
 	if (count($_POST) > 0) {
 		check_admin_referer('limit-login-attempts-options');
 	}
-		
+
 	/* Should we clear log? */
 	if (isset($_POST['clear_log'])) {
 		delete_option('limit_login_logged');
@@ -930,7 +929,7 @@ function limit_login_option_page()	{
 			. __('Cleared IP log', 'limit-login-attempts')
 			. '</p></div>';
 	}
-		
+
 	/* Should we reset counter? */
 	if (isset($_POST['reset_total'])) {
 		update_option('limit_login_lockouts_total', 0);
@@ -938,7 +937,7 @@ function limit_login_option_page()	{
 			. __('Reset lockout count', 'limit-login-attempts')
 			. '</p></div>';
 	}
-		
+
 	/* Should we restore current lockouts? */
 	if (isset($_POST['reset_current'])) {
 		update_option('limit_login_lockouts', array());
@@ -1003,7 +1002,7 @@ function limit_login_option_page()	{
 		$client_type_warning = '<br /><br />' . sprintf(__('<strong>Current setting appears to be invalid</strong>. Please make sure it is correct. Further information can be found <a href="%s" title="FAQ">here</a>','limit-login-attempts'), $faq);
 	}
 
-	$v = explode(',', limit_login_option('lockout_notify')); 
+	$v = explode(',', limit_login_option('lockout_notify'));
 	$log_checked = in_array('log', $v) ? ' checked ' : '';
 	$email_checked = in_array('email', $v) ? ' checked ' : '';
 	?>
@@ -1027,7 +1026,7 @@ function limit_login_option_page()	{
 			<th scope="row" valign="top"><?php echo __('Active lockouts','limit-login-attempts'); ?></th>
 			<td>
 			  <input name="reset_current" value="<?php echo __('Restore Lockouts','limit-login-attempts'); ?>" type="submit" />
-			  <?php echo sprintf(__('%d IP is currently blocked from trying to log in','limit-login-attempts'), $lockouts_now); ?> 
+			  <?php echo sprintf(__('%d IP is currently blocked from trying to log in','limit-login-attempts'), $lockouts_now); ?>
 			</td>
 		  </tr>
 		  <?php } ?>
@@ -1051,13 +1050,13 @@ function limit_login_option_page()	{
 			<td>
 			  <?php echo $client_type_message; ?>
 			  <label>
-				<input type="radio" name="client_type" 
-					   <?php echo $client_type_direct; ?> value="<?php echo LIMIT_LOGIN_DIRECT_ADDR; ?>" /> 
-					   <?php echo __('Direct connection','limit-login-attempts'); ?> 
+				<input type="radio" name="client_type"
+					   <?php echo $client_type_direct; ?> value="<?php echo LIMIT_LOGIN_DIRECT_ADDR; ?>" />
+					   <?php echo __('Direct connection','limit-login-attempts'); ?>
 			  </label>
 			  <label>
-				<input type="radio" name="client_type" 
-					   <?php echo $client_type_proxy; ?> value="<?php echo LIMIT_LOGIN_PROXY_ADDR; ?>" /> 
+				<input type="radio" name="client_type"
+					   <?php echo $client_type_proxy; ?> value="<?php echo LIMIT_LOGIN_PROXY_ADDR; ?>" />
 				  <?php echo __('From behind a reversy proxy','limit-login-attempts'); ?>
 			  </label>
 			  <?php echo $client_type_warning; ?>
@@ -1118,7 +1117,7 @@ function limit_login_option_page()	{
 		} /* if showing $log */
 	  ?>
 
-	</div>	
-	<?php		
-}	
+	</div>
+	<?php
+}
 ?>
