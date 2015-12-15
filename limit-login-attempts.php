@@ -1,7 +1,7 @@
 <?php
 /*
   Plugin Name: Limit Login Attempts
-  Plugin URI: http://devel.kostdoktorn.se/limit-login-attempts
+  Plugin URI: https://wordpress.org/plugins/limit-login-attempts/
   Description: Limit rate of login attempts, including by way of cookies, for each IP.
   Author: Johan Eenfeldt
   Author URI: http://devel.kostdoktorn.se
